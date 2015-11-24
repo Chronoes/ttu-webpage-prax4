@@ -1,0 +1,47 @@
+{
+  "name": "flint-steel",
+  "version": "0.0.1",
+  "description": "Flint&Steel - Tinder clone",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "keywords": [
+    "javascript"
+  ],
+  "private": "true",
+  "author": "Chronoes",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "axios": "^0.7.0",
+    "bootstrap": "https://github.com/twbs/bootstrap/tarball/v4.0.0-alpha",
+    "immutable": "^3.7.5",
+    "react": "^0.14.0",
+    "react-dom": "^0.14.0",
+    "react-redux": "^4.0.0",
+    "redux": "^3.0.4"
+  },
+  "devDependencies": {
+    "babel-core": "^5.8.25",
+    "babel-eslint": "^4.1.5",
+    "babelify": "^6.3.0",
+    "browserify": "^11.1.0",
+    "eslint": "^1.10.1",
+    "eslint-config-airbnb": "^1.0.0",
+    "eslint-plugin-react": "^3.4.1",
+    "express": "^4.13.3",
+    "gulp": "^3.9.0",
+    "gulp-cached": "^1.1.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-eslint": "^1.1.0",
+    "gulp-minify-css": "^1.2.1",
+    "gulp-minify-html": "^1.0.4",
+    "gulp-remember": "^0.3.0",
+    "gulp-sass": "^2.0.4",
+    "gulp-sass-lint": "^1.0.1",
+    "gulp-sloc": "^1.0.4",
+    "run-sequence": "^1.1.3",
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.4.0"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "env": {
+    "node": true,
+    "es6": true
+  },
+  "ecmaFeatures": {
+    "jsx": true
+  },
+  "parser": "babel-eslint",
+  "extends": "airbnb",
+  "rules": {
+    "func-names": 0,
+    "new-cap": 0,
+    "comma-dangle": 0,
+    "react/prop-types": 0,
+  }
+}

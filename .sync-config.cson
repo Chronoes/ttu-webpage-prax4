@@ -1,0 +1,26 @@
+remote:
+  host: "dijkstra.cs.ttu.ee"
+  user: "Marten.Tarkin"
+  path: "~/public_html/prax4"
+behaviour:
+  uploadOnSave: false
+  syncDownOnOpen: false
+  forgetConsole: false
+  autoHideConsole: true
+  alwaysSyncAll: false
+option:
+  deleteFiles: false
+  exclude: [
+    ".sync-config.cson"
+    ".git"
+    "node_modules"
+    "tmp"
+    "vendor"
+    "src"
+    ".eslintrc"
+    ".gitignore"
+    ".sass-lint.yml"
+    "Gulpfile.babel.js"
+    "package.json"
+    "server.js"
+  ]
