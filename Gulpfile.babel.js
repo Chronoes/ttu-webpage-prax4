@@ -27,7 +27,7 @@ const directories = {
     styles: 'src/styles/**/*.scss',
     images: 'src/images/**/*',
   },
-  distribution: 'remote',
+  distribution: 'prax4',
 };
 
 gulp.task('lint:sass', () => {
