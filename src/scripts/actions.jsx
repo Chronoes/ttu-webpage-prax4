@@ -1,51 +1,54 @@
 import {post} from 'axios';
-import {bindActionCreators} from 'redux';
 
 export function getTokenFromStorage() {
   const token = localStorage.getItem('token');
   return {type: 'GET_TOKEN', token};
 }
 
-function loginSuccess(response) {
-  return {type: 'LOGIN_SUCCESS', token: response.data.token};
+function loginSuccess(token) {
+  localStorage.setItem('token', token);
+  return {type: 'LOGIN_SUCCESS', token};
 }
 
-function loginError(response) {
-  return {type: 'LOGIN_ERROR', errorMessage: response.data.message};
+function loginError(errorMessage) {
+  return {type: 'LOGIN_ERROR', errorMessage};
 }
 
 export function login(email, password) {
   return dispatch => {
-    const {boundLoginSuccess, boundLoginError} = bindActionCreators({loginSuccess, loginError}, dispatch);
     dispatch({type: 'LOGIN'});
     return post('/api', {email, password}, {
       params: {
-        action: 'test',
+        action: 'login',
       },
     })
-    .then(boundLoginSuccess)
-    .catch(boundLoginError);
+    .then(response => dispatch(loginSuccess(response.data.token)))
+    .catch(response => dispatch(loginError(response.data.message)));
   };
 }
 
-function registerSuccess(response) {
-  return {type: 'REGISTER_SUCCESS', token: response.data.token};
+function registerSuccess(token) {
+  return {type: 'REGISTER_SUCCESS', token};
 }
 
-function registerError(response) {
-  return {type: 'REGISTER_ERROR', errorMessage: response.data.message};
+function registerError(errorMessage) {
+  return {type: 'REGISTER_ERROR', errorMessage};
 }
 
 export function register(email, password) {
   return dispatch => {
-    const {boundRegisterSuccess, boundRegisterError} = bindActionCreators({registerSuccess, registerError}, dispatch);
     dispatch({type: 'REGISTER'});
     return post('/api', {email, password}, {
       params: {
-        action: 'test',
+        action: 'register',
       },
     })
-    .then(boundRegisterSuccess)
-    .catch(boundRegisterError);
+    .then(response => dispatch(registerSuccess(response.data.token)))
+    .catch(response => dispatch(registerError(response.data.message)));
   };
+}
+
+export function logout() {
+  localStorage.removeItem('token');
+  return {type: 'LOGOUT'};
 }

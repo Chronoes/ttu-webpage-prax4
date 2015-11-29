@@ -1,32 +1,22 @@
 <?php
-function var_dumper() {
-    ob_start();
-    foreach (func_get_args() as $value) {
-        var_dump($value);
-    }
-    $out = ob_get_clean();
-    echo "<pre>$out</pre>";
-}
-
-error_reporting(E_ALL);
 require 'constants.php';
-require 'database/models/User.php';
-require 'Authorization.php';
+require 'ResponseService.php';
 
-$user = User::create(array(
-    'email' => 'test@gmail.com',
-    'password' => 'plaintext',
-    'displayName' => 'awwyeah',
-    'fullName' => 'Not Me'
-));
+$response = new ResponseService;
 
-var_dumper((new User())->getTableName());
-var_dumper($user->getTableName(), $user->email, $user->password, $user->displayName, $user->fullName);
-
-$token = Authorization::generateToken(array('email' => $user->email));
-var_dumper($token, Authorization::verifyToken($token));
-var_dumper($_REQUEST);
-var_dumper(json_decode(file_get_contents('php://input')));
-var_dumper((new Database())->query('SHOW TABLES;')->fetchAll());
-
+if (isset($_REQUEST['action'])) {
+    switch ($_REQUEST['action']) {
+    case 'login':
+        include 'login.php';
+        break;
+    case 'register':
+        include 'register.php';
+        break;
+    default:
+        $response->status(501)->send(['message' => "\"$_REQUEST[action]\" has not been implemented."]);
+        break;
+    }
+} else {
+    $response->status(404)->send(['message' => 'Nothing here mate.']);
+}
 ?>

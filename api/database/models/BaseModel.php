@@ -13,11 +13,22 @@ class BaseModel {
 
     public function __construct($tableName, $fields, $fieldDefinitions) {
         if (!self::$dsn instanceof Database) {
-            self::$dsn = new Database();
+            self::$dsn = new Database;
         }
-        $this->fields = $fields;
+        if (!empty($fields)) {
+            $this->fields = $this->validateNulls($fields, $fieldDefinitions);
+        }
         $this->fieldDefinitions = $fieldDefinitions;
         $this->tableName = $tableName;
+    }
+
+    private function validateNulls($fields, $definitions) {
+        foreach ($definitions as $key => $props) {
+            if (isset($props['allowNull']) && !$props['allowNull'] && !in_array($key, array_keys($fields))) {
+                throw new DatabaseException("Field \"$key\" cannot be NULL");
+            }
+        }
+        return $fields;
     }
 
     public function __get($key) {
@@ -32,42 +43,105 @@ class BaseModel {
         return $this->tableName;
     }
 
-    public function findOne($attributes = array(), $where = array()) {
+    public function fields() {
+        return array_merge(['id' => $this->id, 'createdAt' => $this->createdAt], $this->fields);
+    }
+
+    private function queryWhere($where) {
+        if (count($where) > 0) {
+            $sqlWhere = [];
+            foreach ($where as $key => $action) {
+                if (is_array($action)) {
+                    $sqlWhere[] = "$key $action[op] :$key";
+                } else {
+                    $sqlWhere[] = "$key = :$key";
+                }
+            }
+            return "WHERE ".implode("\nAND", $sqlWhere);
+        }
+        return '';
+    }
+
+    private function bindQueryParams(&$query, $params) {
+        foreach ($params as $key => $action) {
+            $value = is_array($action) ? $action['value'] : $action;
+            $query->bindValue(":$key", $value, $this->fieldDefinitions[$key]['type']);
+        }
+    }
+
+    private function select($where, $attributes, $extraStatements = '') {
         $fields = count($attributes) > 0 ? implode(', ', $attributes) : '*';
         $sql = "
-            SELECT $fields
-            FROM {$this->tableName}
+        SELECT $fields
+        FROM {$this->tableName}
+        {$this->queryWhere($where)}
+        $extraStatements
         ";
 
-        if (count($where) > 0) {
-            $sqlWhere = array();
-            foreach ($where as $key => $action) {
-                $sqlWhere[] = "$key $action[op] $action[value]";
-            }
-            $sql .= "
-            WHERE ".implode("\nAND", $sqlWhere)."
-            ";
-        }
-        $sql .= 'LIMIT 1';
         $query = self::$dsn->prepare($sql);
 
-        foreach ($where as $key => $action) {
-            $query->bindParam(":$key", $action['value'], $this->fieldDefinitions[$key]);
-        }
-    }
-}
+        $this->bindQueryParams($query, $where);
 
-class ModelFactory {
-    public static function create($name, $fieldDefinitions) {
-        return new BaseModel(Database::formatTableName($name), array(), $fieldDefinitions);
+        if (!$query->execute()) {
+            $query->debugDumpParams();
+            throw new DatabaseException(implode('; ', $query->errorInfo()));
+        }
+
+        return $query;
     }
 
-    public static function createFromValues($name, $fields, $fieldDefinitions) {
-        $fields = array_intersect_key($fields, $fieldDefinitions);
-        if (count($fields) < count($fieldDefinitions)) {
-            throw new DatabaseException('Database Error: missing required fields');
+    private function insertValues() {
+        $result = ['columns' => [], 'values' => []];
+        foreach ($this->fields as $key => $value) {
+            $result['columns'][] = $key;
+            $result['values'][] = ":$key";
         }
-        return new BaseModel(Database::formatTableName($name), $fields, $fieldDefinitions);
+        return [
+            'columns' => implode(', ', $result['columns']),
+            'values' => implode(', ', $result['values'])
+        ];
+    }
+
+    private function insert() {
+        $insertValues = $this->insertValues();
+        $sql = "
+        INSERT INTO {$this->tableName}
+            ($insertValues[columns])
+        VALUES
+            ($insertValues[values])";
+
+        $query = self::$dsn->prepare($sql);
+
+        $this->bindQueryParams($query, $this->fields);
+
+        if (!$query->execute()) {
+            $query->debugDumpParams();
+            throw new DatabaseException(implode('; ', $query->errorInfo()));
+        }
+
+        return $query;
+    }
+
+    public function findOne($where = [], $attributes = []) {
+        $query = $this->select($where, $attributes, 'LIMIT 1');
+        $results = $query->fetch(Database::FETCH_ASSOC);
+        if (empty($results)) {
+            return null;
+        }
+        $this->id = $results['id'];
+        $this->createdAt = $results['createdAt'];
+        unset($results['id'], $results['createdAt']);
+
+        foreach ($results as $key => $value) {
+            $this->$key = $value;
+        }
+
+        return $this;
+    }
+
+    public function save() {
+        $this->insert();
+        $this->id = self::$dsn->lastInsertId();
     }
 }
 

@@ -102,7 +102,8 @@ class LoginForm extends Component {
             </div> : ''}
             {errorMessage ? <div className="alert alert-danger">{errorMessage}</div> : ''}
             <div className="form-group btn-form">
-              {isLoading ? <Preloader /> :
+              {isLoading ?
+                <Preloader /> :
                 <input
                   type="submit"
                   value={registration ? 'register' : 'login'}

@@ -2,19 +2,15 @@
 require_once 'BaseModel.php';
 
 class User extends BaseModel {
-    private static $fieldDefinitions = array(
-        'email' => array('type' => Database::PARAM_STR, 'unique' => true),
-        'password' => array('type' => Database::PARAM_STR),
-        'displayName' => array('type' => Database::PARAM_STR),
-        'fullName' => array('type' => Database::PARAM_STR)
-    );
+    private static $fieldDefinitions = [
+        'email' => ['type' => Database::PARAM_STR, 'unique' => true, 'allowNull' => false],
+        'password' => ['type' => Database::PARAM_STR, 'allowNull' => false],
+        'displayName' => ['type' => Database::PARAM_STR],
+        'fullName' => ['type' => Database::PARAM_STR]
+    ];
 
-    public function __construct() {
-        return parent::__construct(Database::formatTableName(__CLASS__), array(), self::$fieldDefinitions);
-    }
-
-    public static function create($fields) {
-        return ModelFactory::createFromValues(__CLASS__, $fields, self::$fieldDefinitions);
+    public function __construct($fields = []) {
+        return parent::__construct(Database::formatTableName(__CLASS__), $fields, self::$fieldDefinitions);
     }
 }
 

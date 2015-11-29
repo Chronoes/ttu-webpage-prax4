@@ -9,7 +9,7 @@ class Database extends PDO {
     }
 
     public static function formatTableName($string) {
-        $parts = array();
+        $parts = [];
         preg_match_all('/[A-Z][a-z]+/', $string, $parts);
         return TABLE_PREFIX.'_'.implode('_', array_map(function($part) {
             return mb_strtolower($part);

@@ -1,11 +1,12 @@
--- DROP TABLE t143076_users
+DROP TABLE t143076_users;
 
 CREATE TABLE t143076_users (
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
-    createdAt DATETIME NOT NULL,
+    createdAt DATETIME NOT NULL DEFAULT now(),
     email VARCHAR(255) NOT NULL UNIQUE,
-    displayName VARCHAR(255) NOT NULL,
-    fullName VARCHAR(255) NOT NULL
-)
+    password VARCHAR(255) NOT NULL,
+    displayName VARCHAR(255),
+    fullName VARCHAR(255)
+);
 
--- DROP TABLE t143076_pictures
+-- DROP TABLE t143076_pictures;

@@ -23,4 +23,6 @@ option:
     "Gulpfile.babel.js"
     "package.json"
     "server.js"
+    "server.sh"
+    "router.php"
   ]
