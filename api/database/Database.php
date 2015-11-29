@@ -9,13 +9,9 @@ class Database extends PDO {
     }
 
     public static function formatTableName($string) {
-        return TABLE_PREFIX.'_'.self::formatField($string);
-    }
-
-    public static function formatField($string) {
         $parts = array();
         preg_match_all('/[A-Z][a-z]+/', $string, $parts);
-        return implode('_', array_map(function($part) {
+        return TABLE_PREFIX.'_'.implode('_', array_map(function($part) {
             return mb_strtolower($part);
         }, $parts[0])).'s';
     }

@@ -5,23 +5,19 @@ require_once __DIR__.'/../Database.php';
 class BaseModel {
     private static $dsn;
     private $tableName;
+    private $fieldDefinitions;
     private $fields;
 
     protected $id;
     protected $createdAt;
 
-    public function __construct($fields, $requiredFields, $optionalFields = array()) {
+    public function __construct($tableName, $fields, $fieldDefinitions) {
         if (!self::$dsn instanceof Database) {
             self::$dsn = new Database();
         }
-        $this->fields = array_intersect_key($fields, array_flip($requiredFields));
-        if (count($this->fields) < count($requiredFields)) {
-            // array_filter(array_flip($requiredFields), function($field) {
-            //     return in_array($field, $filt)
-            // }, ARRAY_FILTER_USE_BOTH);
-            throw new DatabaseException('Database Error: missing required fields');
-        }
-        $this->tableName = Database::formatTableName(get_called_class());
+        $this->fields = $fields;
+        $this->fieldDefinitions = $fieldDefinitions;
+        $this->tableName = $tableName;
     }
 
     public function __get($key) {
@@ -34,6 +30,44 @@ class BaseModel {
 
     public function getTableName() {
         return $this->tableName;
+    }
+
+    public function findOne($attributes = array(), $where = array()) {
+        $fields = count($attributes) > 0 ? implode(', ', $attributes) : '*';
+        $sql = "
+            SELECT $fields
+            FROM {$this->tableName}
+        ";
+
+        if (count($where) > 0) {
+            $sqlWhere = array();
+            foreach ($where as $key => $action) {
+                $sqlWhere[] = "$key $action[op] $action[value]";
+            }
+            $sql .= "
+            WHERE ".implode("\nAND", $sqlWhere)."
+            ";
+        }
+        $sql .= 'LIMIT 1';
+        $query = self::$dsn->prepare($sql);
+
+        foreach ($where as $key => $action) {
+            $query->bindParam(":$key", $action['value'], $this->fieldDefinitions[$key]);
+        }
+    }
+}
+
+class ModelFactory {
+    public static function create($name, $fieldDefinitions) {
+        return new BaseModel(Database::formatTableName($name), array(), $fieldDefinitions);
+    }
+
+    public static function createFromValues($name, $fields, $fieldDefinitions) {
+        $fields = array_intersect_key($fields, $fieldDefinitions);
+        if (count($fields) < count($fieldDefinitions)) {
+            throw new DatabaseException('Database Error: missing required fields');
+        }
+        return new BaseModel(Database::formatTableName($name), $fields, $fieldDefinitions);
     }
 }
 
