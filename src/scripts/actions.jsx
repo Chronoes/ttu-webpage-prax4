@@ -17,7 +17,7 @@ function loginError(errorMessage) {
 export function login(email, password) {
   return dispatch => {
     dispatch({type: 'LOGIN'});
-    return post('/api', {email, password}, {
+    return post('../api', {email, password}, {
       params: {
         action: 'login',
       },
@@ -38,7 +38,7 @@ function registerError(errorMessage) {
 export function register(email, password) {
   return dispatch => {
     dispatch({type: 'REGISTER'});
-    return post('/api', {email, password}, {
+    return post('../api', {email, password}, {
       params: {
         action: 'register',
       },

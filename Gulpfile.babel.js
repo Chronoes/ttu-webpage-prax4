@@ -27,6 +27,7 @@ const directories = {
     styles: 'src/styles/**/*.scss',
     images: 'src/images/**/*',
   },
+  api: 'api/**/*.php',
   distribution: 'prax4',
 };
 
@@ -53,6 +54,7 @@ gulp.task('line-count', () => {
     [
       directories.root,
       directories.source.scripts,
+      directories.api,
     ])
     .pipe(remember('scripts'))
     .pipe(sloc());
