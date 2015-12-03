@@ -2,7 +2,7 @@ import React, {PropTypes as Types} from 'react';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 
-import {login, register} from '../actions';
+import {login, register} from '../actions/authActions';
 import LoginForm from '../components/LoginForm';
 
 const LoginPage = ({dispatch, ...otherProps}) => (

@@ -1,5 +1,4 @@
 import {Map} from 'immutable';
-import {combineReducers} from 'redux';
 
 const authState = new Map({
   token: '',
@@ -12,20 +11,17 @@ function authorization(state = authState, action) {
   case 'GET_TOKEN':
     return action.token ? state.set('token', action.token) : state;
 
-  case 'LOGIN':
-  case 'REGISTER':
+  case 'AUTH':
     return state
     .set('isLoading', true)
     .set('errorMessage', '');
 
-  case 'LOGIN_SUCCESS':
-  case 'REGISTER_SUCCESS':
+  case 'AUTH_SUCCESS':
     return state
     .set('isLoading', false)
     .set('token', action.token);
 
-  case 'LOGIN_ERROR':
-  case 'REGISTER_ERROR':
+  case 'AUTH_ERROR':
     return state
     .set('isLoading', false)
     .set('errorMessage', action.errorMessage);
@@ -38,6 +34,4 @@ function authorization(state = authState, action) {
   }
 }
 
-export default combineReducers({
-  authorization,
-});
+export default authorization;
