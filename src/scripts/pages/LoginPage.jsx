@@ -20,9 +20,6 @@ LoginPage.propTypes = {
   isLoading: Types.bool,
 };
 
-export default connect(state => {
-  return {
-    errorMessage: state.authorization.get('errorMessage'),
-    isLoading: state.authorization.get('isLoading'),
-  };
+export default connect(({authorization}) => {
+  return {authorization};
 })(LoginPage);

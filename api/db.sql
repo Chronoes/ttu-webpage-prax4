@@ -6,7 +6,18 @@ CREATE TABLE t143076_users (
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     displayName VARCHAR(255),
-    fullName VARCHAR(255)
+    fullName VARCHAR(255),
+    description TEXT
 );
 
--- DROP TABLE t143076_pictures;
+DROP TABLE t143076_pictures;
+
+CREATE TABLE t143076_pictures (
+    id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    createdAt DATETIME NOT NULL DEFAULT now(),
+    userId INTEGER,
+    imageURI TEXT NOT NULL,
+    FOREIGN KEY (userId)
+        REFERENCES t143076_users(id)
+        ON UPDATE CASCADE ON DELETE CASCADE
+);

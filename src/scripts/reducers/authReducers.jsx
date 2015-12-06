@@ -4,9 +4,10 @@ const authState = new Map({
   token: '',
   errorMessage: '',
   isLoading: false,
+  missingData: false,
 });
 
-function authorization(state = authState, action) {
+export default function authorization(state = authState, action) {
   switch (action.type) {
   case 'GET_TOKEN':
     return action.token ? state.set('token', action.token) : state;
@@ -33,5 +34,3 @@ function authorization(state = authState, action) {
     return state;
   }
 }
-
-export default authorization;

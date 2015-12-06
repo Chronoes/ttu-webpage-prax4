@@ -5,6 +5,7 @@ class ResponseService {
         200 => 'OK',
         201 => 'Created',
         400 => 'Bad Request',
+        401 => 'Unauthorized',
         403 => 'Forbidden',
         404 => 'Not Found',
         501 => 'Not Implemented'
@@ -30,8 +31,8 @@ class ResponseService {
 
     public function send($data) {
         $statusText = self::$statusInfo[$this->statusCode];
-        header("HTTP/1.1 {$this->statusCode} $statusText");
-        header("Status: {$this->statusCode} $statusText");
+        header("HTTP/1.1 $this->statusCode $statusText");
+        header("Status: $this->statusCode $statusText");
 
         $json = json_encode($data);
         header('Content-Length: '.mb_strlen($json));

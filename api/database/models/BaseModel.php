@@ -7,6 +7,10 @@ class BaseModel {
     private $tableName;
     private $fieldDefinitions;
     private $fields;
+    private $staticFieldDefinitions = [
+        'id' => ['type' => Database::PARAM_INT],
+        'createdAt' => ['type' => Database::PARAM_STR]
+    ];
 
     protected $id;
     protected $createdAt;
@@ -18,7 +22,7 @@ class BaseModel {
         if (!empty($fields)) {
             $this->fields = $this->validateNulls($fields, $fieldDefinitions);
         }
-        $this->fieldDefinitions = $fieldDefinitions;
+        $this->fieldDefinitions = array_merge($this->staticFieldDefinitions, $fieldDefinitions);
         $this->tableName = $tableName;
     }
 
@@ -36,7 +40,11 @@ class BaseModel {
     }
 
     public function __set($key, $value) {
-        $this->fields[$key] = $value;
+        if (isset($this->fieldDefinitions[$key])) {
+            $this->fields[$key] = $value;
+        } else {
+            throw new DatabaseException("$key is not a valid field");
+        }
     }
 
     public function getTableName() {
@@ -47,16 +55,21 @@ class BaseModel {
         return array_merge(['id' => $this->id, 'createdAt' => $this->createdAt], $this->fields);
     }
 
+    private function queryOperations($operationList) {
+        $operations = [];
+        foreach ($operationList as $key => $action) {
+            if (is_array($action)) {
+                $operations[] = "$key $action[op] :$key";
+            } else {
+                $operations[] = "$key = :$key";
+            }
+        }
+        return $operations;
+    }
+
     private function queryWhere($where) {
         if (count($where) > 0) {
-            $sqlWhere = [];
-            foreach ($where as $key => $action) {
-                if (is_array($action)) {
-                    $sqlWhere[] = "$key $action[op] :$key";
-                } else {
-                    $sqlWhere[] = "$key = :$key";
-                }
-            }
+            $sqlWhere = $this->queryOperations($where);
             return "WHERE ".implode("\nAND", $sqlWhere);
         }
         return '';
@@ -73,7 +86,7 @@ class BaseModel {
         $fields = count($attributes) > 0 ? implode(', ', $attributes) : '*';
         $sql = "
         SELECT $fields
-        FROM {$this->tableName}
+        FROM $this->tableName
         {$this->queryWhere($where)}
         $extraStatements
         ";
@@ -105,7 +118,7 @@ class BaseModel {
     private function insert() {
         $insertValues = $this->insertValues();
         $sql = "
-        INSERT INTO {$this->tableName}
+        INSERT INTO $this->tableName
             ($insertValues[columns])
         VALUES
             ($insertValues[values])";
@@ -122,26 +135,88 @@ class BaseModel {
         return $query;
     }
 
-    public function findOne($where = [], $attributes = []) {
-        $query = $this->select($where, $attributes, 'LIMIT 1');
-        $results = $query->fetch(Database::FETCH_ASSOC);
-        if (empty($results)) {
-            return null;
+    private function update($where = []) {
+        $queryOps = implode(', ', $this->queryOperations($this->fields));
+        $sql = "
+        UPDATE $this->tableName
+        SET $queryOps
+        {$this->queryWhere($where)}";
+
+        $query = self::$dsn->prepare($sql);
+
+        $this->bindQueryParams($query, array_merge($this->fields, $where));
+
+        if (!$query->execute()) {
+            $query->debugDumpParams();
+            throw new DatabaseException(implode('; ', $query->errorInfo()));
         }
-        $this->id = $results['id'];
-        $this->createdAt = $results['createdAt'];
-        unset($results['id'], $results['createdAt']);
+
+        return $query;
+    }
+
+    private function assignAttributes($results, $attributes) {
+        if (!empty($attributes)) {
+            $results = array_merge($attributes, $results);
+        }
+
+        if (isset($results['id'])) {
+            $this->id = $results['id'];
+            unset($results['id']);
+        }
+
+        if (isset($results['createdAt'])) {
+            $this->createdAt = $results['createdAt'];
+            unset($results['createdAt']);
+        }
 
         foreach ($results as $key => $value) {
             $this->$key = $value;
         }
+    }
+
+    private function fetchData(&$query, $attributes = []) {
+        $results = $query->fetch(Database::FETCH_ASSOC);
+        if (empty($results)) {
+            return null;
+        }
+
+        $this->assignAttributes($results, $attributes);
 
         return $this;
+    }
+
+    protected function getAssociation($foreignId) {
+        $query = $this->select([$this->fieldDefinitions['foreignKey'] => $foreignId], [], 'LIMIT 1');
+        return $this->fetchData($query);
+    }
+
+    public function findOne($where = [], $attributes = []) {
+        $query = $this->select($where, $attributes, 'LIMIT 1');
+        return $this->fetchData($query);
+    }
+
+    public function findById($id, $attributes = []) {
+        $query = $this->select(['id' => $id], $attributes);
+        return $this->fetchData($query);
     }
 
     public function save() {
         $this->insert();
         $this->id = self::$dsn->lastInsertId();
+        return $this;
+    }
+
+    public function updateWith($newFields) {
+        unset($newFields['id'], $newFields['createdAt']);
+        foreach ($newFields as $key => $value) {
+            if (!in_array($key, array_keys($this->fields))) {
+                unset($newFields[$key]);
+            }
+        }
+        $this->fields = array_merge($this->fields, $newFields);
+        $this->update(['id' => $this->id]);
+        $this->assignAttributes($newFields, []);
+        return $this;
     }
 }
 

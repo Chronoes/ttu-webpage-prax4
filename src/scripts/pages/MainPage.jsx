@@ -1,23 +1,44 @@
-import React, {PropTypes as Types} from 'react';
+import React, {Component, PropTypes as Types} from 'react';
 import {connect} from 'react-redux';
+import {Map} from 'immutable';
+import {decode} from 'jsonwebtoken';
 
-import {logout} from '../actions';
+import UserProfile from '../components/UserProfile';
+import {logout} from '../actions/authActions';
+import {getProfile, setProfile} from '../actions/profileActions';
 
-const MainPage = ({token, dispatch}) => {
-  return (
-    <div className="container-fluid">
-      {token}
-      <button onClick={() => dispatch(logout())}>Logout</button>
-    </div>
-  );
-};
+class MainPage extends Component {
+  static displayName = 'MainPage';
+  static propTypes = {
+    dispatch: Types.func.isRequired,
+    token: Types.string.isRequired,
+    profile: Types.instanceOf(Map).isRequired,
+  };
 
-MainPage.displayName = 'MainPage';
-MainPage.propTypes = {
-  dispatch: Types.func.isRequired,
-  token: Types.string.isRequired,
-};
+  componentWillMount() {
+    this.props.dispatch(getProfile(this.props.token));
+  }
 
-export default connect(state => {
-  return {token: state.authorization.get('token')};
+  render() {
+    const {token, profile, dispatch} = this.props;
+    const {email} = decode(token);
+    return (
+      <div className="container-fluid">
+        {!(profile.get('fullName') && profile.get('displayName') && profile.get('imageURI')) ?
+          <UserProfile
+            profile={profile}
+            email={email}
+            setProfile={newProfile => dispatch(setProfile(token, newProfile))} /> :
+          token}
+        <button onClick={() => dispatch(logout())}>Logout</button>
+      </div>
+    );
+  }
+}
+
+export default connect(({authorization, profile}) => {
+  return {
+    token: authorization.get('token'),
+    profile,
+  };
 })(MainPage);

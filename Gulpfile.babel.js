@@ -56,7 +56,7 @@ gulp.task('line-count', () => {
       directories.source.scripts,
       directories.api,
     ])
-    .pipe(remember('scripts'))
+    .pipe(remember('sourcecode'))
     .pipe(sloc());
 });
 

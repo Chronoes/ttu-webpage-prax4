@@ -1,4 +1,4 @@
-import {post} from 'axios';
+import {authRequest} from '../apiService';
 
 export function getTokenFromStorage() {
   const token = localStorage.getItem('token');
@@ -17,9 +17,9 @@ function authError(errorMessage) {
 function auth(action, email, password) {
   return dispatch => {
     dispatch({type: 'AUTH'});
-    return post('../api', {email, password}, {params: {action}})
+    return authRequest(action, email, password)
     .then(response => dispatch(authSuccess(response.data.token)))
-    .catch(response => dispatch(authError(response.data.message)));
+    .catch(response => dispatch(authError(response.data ? response.data.message : response.message)));
   };
 }
 

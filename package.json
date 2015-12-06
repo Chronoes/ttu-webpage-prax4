@@ -16,6 +16,7 @@
     "axios": "^0.7.0",
     "bootstrap": "https://github.com/twbs/bootstrap/tarball/v4.0.0-alpha",
     "immutable": "^3.7.5",
+    "jsonwebtoken": "^5.4.1",
     "react": "^0.14.0",
     "react-dom": "^0.14.0",
     "react-redux": "^4.0.0",

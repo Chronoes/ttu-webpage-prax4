@@ -1,7 +1,7 @@
 import React, {Component, PropTypes as Types} from 'react';
 import {connect} from 'react-redux';
 
-import {getTokenFromStorage} from './actions';
+import {getTokenFromStorage} from './actions/authActions';
 import LoginPage from './pages/LoginPage';
 import MainPage from './pages/MainPage';
 
@@ -20,7 +20,7 @@ class App extends Component {
     const {token} = this.props;
     return (
       <div>
-        {token.length === 0 ?
+        {token.length === 0 || token === 'undefined' ?
           <LoginPage /> :
           <MainPage />}
       </div>
@@ -28,6 +28,6 @@ class App extends Component {
   }
 }
 
-export default connect(state => {
-  return {token: state.authorization.get('token')};
+export default connect(({authorization}) => {
+  return {token: authorization.get('token')};
 })(App);

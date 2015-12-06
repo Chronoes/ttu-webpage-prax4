@@ -1,4 +1,5 @@
 import React, {Component, PropTypes as Types} from 'react';
+import {Map} from 'immutable';
 
 import Preloader from './Preloader';
 
@@ -7,8 +8,7 @@ class LoginForm extends Component {
   static propTypes = {
     login: Types.func.isRequired,
     register: Types.func.isRequired,
-    errorMessage: Types.string,
-    isLoading: Types.bool,
+    authorization: Types.instanceOf(Map).isRequired,
   };
 
   constructor(props) {
@@ -20,7 +20,7 @@ class LoginForm extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState({errorMessage: nextProps.errorMessage});
+    this.setState({errorMessage: nextProps.authorization.get('errorMessage')});
   }
 
   componentWillUnmount() {
@@ -71,7 +71,7 @@ class LoginForm extends Component {
   }
 
   render() {
-    const {isLoading} = this.props;
+    const {authorization} = this.props;
     const {errorMessage, registration} = this.state;
     return (
       <div className="form-container">
@@ -102,7 +102,7 @@ class LoginForm extends Component {
             </div> : ''}
             {errorMessage ? <div className="alert alert-danger">{errorMessage}</div> : ''}
             <div className="form-group btn-form">
-              {isLoading ?
+              {authorization.get('isLoading') ?
                 <Preloader /> :
                 <input
                   type="submit"
