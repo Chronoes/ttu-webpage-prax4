@@ -1,23 +1,39 @@
-DROP TABLE t143076_users;
+-- DROP TABLE t143076_users;
 
 CREATE TABLE t143076_users (
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
     createdAt DATETIME NOT NULL DEFAULT now(),
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
+    gender CHAR(1),
     displayName VARCHAR(255),
     fullName VARCHAR(255),
     description TEXT
 );
 
-DROP TABLE t143076_pictures;
+-- DROP TABLE t143076_pictures;
 
 CREATE TABLE t143076_pictures (
     id INTEGER AUTO_INCREMENT PRIMARY KEY,
     createdAt DATETIME NOT NULL DEFAULT now(),
-    userId INTEGER,
-    imageURI TEXT NOT NULL,
+    userId INTEGER NOT NULL,
+    imageURI MEDIUMTEXT NOT NULL,
     FOREIGN KEY (userId)
         REFERENCES t143076_users(id)
         ON UPDATE CASCADE ON DELETE CASCADE
 );
+
+-- DROP TABLE t143076_likes
+
+CREATE TABLE t143076_likes (
+    id INTEGER AUTO_INCREMENT PRIMARY KEY,
+    createdAt DATETIME NOT NULL DEFAULT now(),
+    likerId INTEGER NOT NULL,
+    targetId INTEGER NOT NULL,
+    FOREIGN KEY (likerId)
+        REFERENCES t143076_users(id)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+    FOREIGN KEY (targetId)
+        REFERENCES t143076_users(id)
+        ON UPDATE CASCADE ON DELETE CASCADE
+)

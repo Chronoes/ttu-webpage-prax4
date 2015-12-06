@@ -70,7 +70,7 @@ class BaseModel {
     private function queryWhere($where) {
         if (count($where) > 0) {
             $sqlWhere = $this->queryOperations($where);
-            return "WHERE ".implode("\nAND", $sqlWhere);
+            return "WHERE ".implode("\nAND ", $sqlWhere);
         }
         return '';
     }
@@ -192,12 +192,17 @@ class BaseModel {
 
     public function findOne($where = [], $attributes = []) {
         $query = $this->select($where, $attributes, 'LIMIT 1');
-        return $this->fetchData($query);
+        return $this->fetchData($query, $attributes);
+    }
+
+    public function findOneRandom($where = [], $attributes = []) {
+        $query = $this->select($where, $attributes, 'ORDER BY RAND() LIMIT 1');
+        return $this->fetchData($query, $attributes);
     }
 
     public function findById($id, $attributes = []) {
         $query = $this->select(['id' => $id], $attributes);
-        return $this->fetchData($query);
+        return $this->fetchData($query, $attributes);
     }
 
     public function save() {

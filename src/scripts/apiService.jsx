@@ -19,3 +19,7 @@ export function getProfileRequest(token) {
 export function setProfileRequest(token, profile) {
   return post('../api', {...profile}, createOptions({action: 'profile'}, token));
 }
+
+export function getRandomProfileRequest(token) {
+  return get('../api', createOptions({action: 'randomProfile'}, token));
+}

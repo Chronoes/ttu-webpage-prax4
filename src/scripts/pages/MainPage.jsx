@@ -4,8 +4,10 @@ import {Map} from 'immutable';
 import {decode} from 'jsonwebtoken';
 
 import UserProfile from '../components/UserProfile';
+import Liker from '../components/Liker';
 import {logout} from '../actions/authActions';
 import {getProfile, setProfile} from '../actions/profileActions';
+import {getLikerProfile} from '../actions/likerProfileActions';
 
 class MainPage extends Component {
   static displayName = 'MainPage';
@@ -13,6 +15,7 @@ class MainPage extends Component {
     dispatch: Types.func.isRequired,
     token: Types.string.isRequired,
     profile: Types.instanceOf(Map).isRequired,
+    likerProfile: Types.instanceOf(Map).isRequired,
   };
 
   componentWillMount() {
@@ -20,7 +23,7 @@ class MainPage extends Component {
   }
 
   render() {
-    const {token, profile, dispatch} = this.props;
+    const {token, profile, likerProfile, dispatch} = this.props;
     const {email} = decode(token);
     return (
       <div className="container-fluid">
@@ -29,16 +32,16 @@ class MainPage extends Component {
             profile={profile}
             email={email}
             setProfile={newProfile => dispatch(setProfile(token, newProfile))} /> :
-          token}
+          <Liker getProfile={() => dispatch(getLikerProfile(token))} profile={likerProfile} />}
         <button onClick={() => dispatch(logout())}>Logout</button>
       </div>
     );
   }
 }
 
-export default connect(({authorization, profile}) => {
+export default connect(({authorization, ...profiles}) => {
   return {
     token: authorization.get('token'),
-    profile,
+    ...profiles,
   };
 })(MainPage);

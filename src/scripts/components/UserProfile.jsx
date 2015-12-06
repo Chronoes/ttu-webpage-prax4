@@ -17,6 +17,7 @@ class UserProfile extends Component {
     this.state = {
       errorMessage: '',
       imageURI: '',
+      gender: '',
     };
   }
 
@@ -29,7 +30,7 @@ class UserProfile extends Component {
     const displayName = this.refs.displayName.value.trim();
     const fullName = this.refs.fullName.value.trim();
     const description = this.refs.description.value.trim();
-    const {imageURI} = this.state;
+    const {imageURI, gender} = this.state;
     const errorMessages = [];
 
     if (!displayName) {
@@ -47,7 +48,7 @@ class UserProfile extends Component {
     if (errorMessages.length) {
       this.setState({errorMessage: errorMessages.shift()});
     } else {
-      this.props.setProfile({displayName, fullName, description, imageURI});
+      this.props.setProfile({displayName, fullName, description, imageURI, gender});
       this.setState({errorMessage: ''});
     }
   }
@@ -71,6 +72,7 @@ class UserProfile extends Component {
                 ref="displayName"
                 className="form-control"
                 placeholder="Display name"
+                defaultValue={profile.get('displayName')}
                 required />
             </div>
             <div className="form-group">
@@ -79,25 +81,40 @@ class UserProfile extends Component {
                 ref="fullName"
                 className="form-control"
                 placeholder="Full name"
+                defaultValue={profile.get('fullName')}
                 required />
             </div>
             <div className="form-group">
               <label className="radio-inline">
-                <input type="radio" value="M" name="gender" required /> Male
+                <input
+                  type="radio"
+                  value="M"
+                  name="gender"
+                  defaultChecked={profile.get('gender') === 'M'}
+                  onClick={() => this.setState({gender: 'M'})}
+                  required />
+                  Male
               </label>
               <label className="radio-inline">
-                <input type="radio" value="F" name="gender" /> Female
+                <input
+                  type="radio"
+                  value="F"
+                  name="gender"
+                  defaultChecked={profile.get('gender') === 'F'}
+                  onClick={() => this.setState({gender: 'F'})} />
+                  Female
               </label>
             </div>
             <div className="form-group">
               <FileUpload ref="image" handleFile={this.saveImage.bind(this)} />
-              {imageURI ? <img className="img-thumbnail img-responsive" src={imageURI} /> : <small className="text-muted">Insert your profile image here</small>}
+              {imageURI ? <img className="profile-image" src={imageURI} /> : <small className="text-muted">Insert your profile image here</small>}
             </div>
             <div className="form-group">
               <textarea
                 ref="description"
                 className="form-control"
                 placeholder="Enter your description here"
+                defaultValue={profile.get('description')}
                 rows="3" />
             </div>
             {errorMessage ? <div className="alert alert-danger">{errorMessage}</div> : ''}

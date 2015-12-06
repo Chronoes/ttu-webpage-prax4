@@ -1,6 +1,5 @@
 <?php
 require_once 'database/models/User.php';
-require_once 'Authorization.php';
 
 $user = (new User)->findById((int) $payload['id']);
 $fields = $user->fields();

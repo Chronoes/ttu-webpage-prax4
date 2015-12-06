@@ -6,6 +6,7 @@ class User extends BaseModel {
     public static $fieldDefinitions = [
         'email' => ['type' => Database::PARAM_STR, 'unique' => true, 'allowNull' => false],
         'password' => ['type' => Database::PARAM_STR, 'allowNull' => false],
+        'gender' => ['type' =>Database::PARAM_STR],
         'displayName' => ['type' => Database::PARAM_STR],
         'fullName' => ['type' => Database::PARAM_STR],
         'description' => ['type' => Database::PARAM_STR]

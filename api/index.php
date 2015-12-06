@@ -29,6 +29,9 @@ if (isset($_REQUEST['action'])) {
     case 'profile':
         if ($payload = tokenCheck($response)) include 'userProfile.php';
         break;
+    case 'randomProfile':
+        if ($payload = tokenCheck($response)) include 'randomProfile.php';
+        break;
     default:
         $response->status(501)->send(['message' => "\"$_REQUEST[action]\" has not been implemented."]);
         break;
