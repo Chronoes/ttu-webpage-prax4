@@ -2,6 +2,7 @@ import React, {Component, PropTypes as Types} from 'react';
 import {connect} from 'react-redux';
 
 import {getTokenFromStorage} from './actions/authActions';
+import {getProfile} from './actions/profileActions';
 import LoginPage from './pages/LoginPage';
 import MainPage from './pages/MainPage';
 
@@ -16,13 +17,20 @@ class App extends Component {
     this.props.dispatch(getTokenFromStorage());
   }
 
+  componentWillReceiveProps(nextProps) {
+    const {token} = nextProps;
+    if (token) {
+      nextProps.dispatch(getProfile(token));
+    }
+  }
+
   render() {
     const {token} = this.props;
     return (
       <div>
         {token.length === 0 || token === 'undefined' ?
           <LoginPage /> :
-          <MainPage />}
+          <MainPage token={token} />}
       </div>
     );
   }

@@ -1,4 +1,4 @@
-import {getRandomProfileRequest} from '../apiService';
+import {getRandomProfileRequest, addLikeRequest} from '../apiService';
 
 function getProfileSuccess(profile) {
   return {type: 'GET_LIKER_PROFILE_SUCCESS', profile};
@@ -15,4 +15,9 @@ export function getLikerProfile(token) {
     .then(response => dispatch(getProfileSuccess(response.data.profile)))
     .catch(response => dispatch(getProfileError(response.data ? response.data.message : response.message)));
   };
+}
+
+export function addLike(token, id) {
+  addLikeRequest(token, id);
+  return {type: 'ADD_LIKE'};
 }

@@ -107,8 +107,8 @@ class UserProfile extends Component {
             </div>
             <div className="form-group">
               <FileUpload ref="image" handleFile={this.saveImage.bind(this)} />
-              {imageURI ? <img className="profile-image" src={imageURI} /> : <small className="text-muted">Insert your profile image here</small>}
             </div>
+            {imageURI ? <img className="profile-image" src={imageURI} /> : <small className="text-muted">Insert your profile image here</small>}
             <div className="form-group">
               <textarea
                 ref="description"

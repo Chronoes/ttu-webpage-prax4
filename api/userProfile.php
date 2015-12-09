@@ -1,6 +1,15 @@
 <?php
 require_once 'database/models/User.php';
 
+function saveImage($userId, $imageURI) {
+    list($type, $uri) = explode(';', $imageURI);
+    $uri = explode(',', $uri)[1];
+    $ext = str_replace('data:image/', '', $type);
+    $filename = "../images/user_$userId.$ext";
+    file_put_contents($filename, base64_decode($uri));
+    return $filename;
+}
+
 $user = (new User)->findById((int) $payload['id']);
 $fields = $user->fields();
 
@@ -17,9 +26,10 @@ case 'GET':
 case 'POST':
     $body = $response->getRequestBody();
     $user->updateWith($body);
-    $picture = $user->setPicture($body['imageURI']);
+    $pictureFilename = saveImage($user->id, $body['imageURI']);
+    $picture = $user->setPicture($pictureFilename);
     $newFields = $user->fields();
-    $newFields['imageURI'] = $picture->imageURI;
+    $newFields['imageURI'] = $pictureFilename;
     unset($newFields['password']);
     return $response->status(200)->send([
         'message' => "User ID $payload[id] updated successfully",

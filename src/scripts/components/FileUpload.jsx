@@ -9,6 +9,7 @@ class FileUpload extends Component {
   handleFile(event) {
     const reader = new FileReader();
     const file = event.target.files[0];
+    this.fileText.textContent = file.name;
 
     reader.onload = this.props.handleFile;
 
@@ -17,7 +18,10 @@ class FileUpload extends Component {
 
   render() {
     return (
-        <input type="file" className="form-control-file" onChange={this.handleFile.bind(this)} />
+      <label className="file">
+        <input type="file" accept="image/*" onChange={this.handleFile.bind(this)} />
+        <span ref={el => this.fileText = el} className="file-custom">Choose file...</span>
+      </label>
     );
   }
 }

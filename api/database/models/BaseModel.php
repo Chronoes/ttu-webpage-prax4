@@ -103,6 +103,26 @@ class BaseModel {
         return $query;
     }
 
+    private function selectCount($where = []) {
+        $sql = "
+        SELECT
+            COUNT(*) as count
+        FROM $this->tableName
+        {$this->queryWhere($where)}
+        ";
+
+        $query = self::$dsn->prepare($sql);
+
+        $this->bindQueryParams($query, $where);
+
+        if (!$query->execute()) {
+            $query->debugDumpParams();
+            throw new DatabaseException(implode('; ', $query->errorInfo()));
+        }
+
+        return $query;
+    }
+
     private function insertValues() {
         $result = ['columns' => [], 'values' => []];
         foreach ($this->fields as $key => $value) {
@@ -115,10 +135,11 @@ class BaseModel {
         ];
     }
 
-    private function insert() {
+    private function insert($ignore = false) {
         $insertValues = $this->insertValues();
+        $ignoreInsert = $ignore ? 'IGNORE' : '';
         $sql = "
-        INSERT INTO $this->tableName
+        INSERT $ignoreInsert INTO $this->tableName
             ($insertValues[columns])
         VALUES
             ($insertValues[values])";
@@ -190,6 +211,19 @@ class BaseModel {
         return $this->fetchData($query);
     }
 
+    protected function rawQuery($sql, $params = []) {
+        $query = self::$dsn->prepare($sql);
+
+        $this->bindQueryParams($query, $params);
+
+        if (!$query->execute()) {
+            $query->debugDumpParams();
+            throw new DatabaseException(implode('; ', $query->errorInfo()));
+        }
+
+        return $query;
+    }
+
     public function findOne($where = [], $attributes = []) {
         $query = $this->select($where, $attributes, 'LIMIT 1');
         return $this->fetchData($query, $attributes);
@@ -205,8 +239,14 @@ class BaseModel {
         return $this->fetchData($query, $attributes);
     }
 
-    public function save() {
-        $this->insert();
+    public function count($where = []) {
+        $query = $this->selectCount($where);
+        $results = $query->fetch(Database::FETCH_ASSOC);
+        return (int) $results['count'];
+    }
+
+    public function save($ignore = false) {
+        $this->insert($ignore);
         $this->id = self::$dsn->lastInsertId();
         return $this;
     }

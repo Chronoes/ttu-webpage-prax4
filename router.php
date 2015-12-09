@@ -1,5 +1,5 @@
 <?php
-if (strpos($_SERVER['REQUEST_URI'], '/api') !== false) {
+if (strpos($_SERVER['REQUEST_URI'], '/api') !== false || strpos($_SERVER['REQUEST_URI'], '/images') !== false) {
     return false;
 } else {
     $extension = explode('.', $_SERVER['REQUEST_URI']);
