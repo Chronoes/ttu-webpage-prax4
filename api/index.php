@@ -1,7 +1,7 @@
 <?php
 require 'constants.php';
-require 'ResponseService.php';
-require 'Authorization.php';
+require 'lib/ResponseService.php';
+require 'lib/Authorization.php';
 
 $response = new ResponseService;
 

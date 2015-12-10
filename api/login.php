@@ -1,5 +1,5 @@
 <?php
-require_once 'Authorization.php';
+require_once 'lib/Authorization.php';
 require_once 'database/models/User.php';
 
 $body = $response->getRequestBody();

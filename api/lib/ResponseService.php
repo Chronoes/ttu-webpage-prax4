@@ -11,8 +11,8 @@ class ResponseService {
         501 => 'Not Implemented'
     ];
 
-    private $statusCode = 200;
     private $requestBody;
+    private $statusHeadersSent = false;
 
     public function __construct() {
         header('Accept: application/json');
@@ -24,15 +24,23 @@ class ResponseService {
         return $this->requestBody;
     }
 
-    public function status($statusCode) {
-        $this->statusCode = $statusCode;
+    public function header($header, $value) {
+        header("$header: $value");
+        return $this;
+    }
+
+    public function status($statusCode = 200) {
+        $statusText = self::$statusInfo[$statusCode];
+        header("HTTP/1.1 $statusCode $statusText");
+        header("Status: $statusCode $statusText");
+        $this->statusHeadersSent = true;
         return $this;
     }
 
     public function send($data) {
-        $statusText = self::$statusInfo[$this->statusCode];
-        header("HTTP/1.1 $this->statusCode $statusText");
-        header("Status: $this->statusCode $statusText");
+        if (!$this->statusHeadersSent) {
+            $this->status();
+        }
 
         $json = json_encode($data);
         header('Content-Length: '.mb_strlen($json));
