@@ -33,3 +33,7 @@ export function setProfile(token, profile) {
     .catch(response => dispatch(setProfileError(response.data ? response.data.message : response.message)));
   };
 }
+
+export function changeProfile() {
+  return {type: 'CHANGE_PROFILE'};
+}

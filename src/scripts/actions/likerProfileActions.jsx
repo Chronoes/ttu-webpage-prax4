@@ -8,10 +8,10 @@ function getProfileError(errorMessage) {
   return {type: 'GET_LIKER_PROFILE_ERROR', errorMessage};
 }
 
-export function getLikerProfile(token) {
+export function getLikerProfile(token, currentId) {
   return dispatch => {
     dispatch({type: 'GET_LIKER_PROFILE'});
-    return getRandomProfileRequest(token)
+    return getRandomProfileRequest(token, currentId)
     .then(response => dispatch(getProfileSuccess(response.data.profile)))
     .catch(response => dispatch(getProfileError(response.data ? response.data.message : response.message)));
   };

@@ -12,7 +12,9 @@ a {
   @extend .col-xs-12;
   @extend .col-sm-6;
   @extend .col-sm-offset-3;
-  margin-top: 10vh;
+  @extend .col-lg-6;
+  @extend .col-lg-offset-3;
+  margin-top: 1vh;
 }
 
 .card-title {
@@ -35,21 +37,24 @@ a {
   @extend .col-md-offset-1;
   @extend .col-lg-10;
   @extend .col-lg-offset-1;
-  margin-top: 3vh;
+  margin-top: 1vh;
 }
 
 .liker {
   @extend .row;
-  align-items: center;
   display: flex;
 
-  &__button {
-    @extend .btn;
+  &__button-wrap {
     @extend .col-xs-1;
     @extend .col-sm-1;
     @extend .col-lg-1;
+    padding: 30vh 0 0;
+  }
+
+  &__button {
+    @extend .btn;
     font-size: 2.5vw;
-    padding: 3em 0;
+    padding: 3em .2em;
 
     &.--success {
       @extend .btn-success;
@@ -70,9 +75,9 @@ a {
 
   &__profile {
     @extend .card;
-    @extend .col-xs-9;
-    @extend .col-sm-9;
-    @extend .col-lg-9;
+    @extend .col-xs-10;
+    @extend .col-sm-10;
+    @extend .col-lg-10;
     margin-left: 2px;
     margin-right: 2px;
     padding-bottom: 2vh;
@@ -88,6 +93,10 @@ a {
     margin-left: auto;
     margin-right: auto;
     max-height: 75vh;
+  }
+
+  &__description {
+    @extend .card-text;
   }
 }
 

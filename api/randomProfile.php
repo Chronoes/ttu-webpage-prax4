@@ -5,7 +5,7 @@ require_once 'database/models/Like.php';
 $user = (new User)->findById((int) $payload['id']);
 
 $randomUser = (new User)->findOneRandom([
-    'id' => ['op' => '!=', 'value' => $user->id],
+    'id' => ['op' => 'NOT IN', 'value' => [$user->id, isset($_REQUEST['currentId']) ? (int) $_REQUEST['currentId'] : 0]],
     'gender' => ['op' => '!=', 'value' => $user->gender]
 ]);
 

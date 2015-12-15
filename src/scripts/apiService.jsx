@@ -1,4 +1,4 @@
-import {get, post} from 'axios';
+import {get, post, put} from 'axios';
 
 function createOptions(action, token = '', params = {}) {
   const options = {params: {action, ...params}};
@@ -9,21 +9,21 @@ function createOptions(action, token = '', params = {}) {
 }
 
 export function authRequest(action, email, password) {
-  return post('../api', {email, password}, createOptions(action));
+  return post('../api/index.php', {email, password}, createOptions(action));
 }
 
 export function getProfileRequest(token) {
-  return get('../api', createOptions('profile', token));
+  return get('../api/index.php', createOptions('profile', token));
 }
 
 export function setProfileRequest(token, profile) {
-  return post('../api', {...profile}, createOptions('profile', token));
+  return put('../api/index.php', {...profile}, createOptions('profile', token));
 }
 
-export function getRandomProfileRequest(token) {
-  return get('../api', createOptions('randomProfile', token));
+export function getRandomProfileRequest(token, currentId) {
+  return get('../api/index.php', createOptions('randomProfile', token, currentId ? {currentId} : {}));
 }
 
 export function addLikeRequest(token, id) {
-  return post('../api', {id}, createOptions('addLike', token));
+  return post('../api/index.php', {id}, createOptions('addLike', token));
 }

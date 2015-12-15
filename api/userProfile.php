@@ -2,12 +2,15 @@
 require_once 'database/models/User.php';
 
 function saveImage($userId, $imageURI) {
-    list($type, $uri) = explode(';', $imageURI);
-    $uri = explode(',', $uri)[1];
-    $ext = str_replace('data:image/', '', $type);
-    $filename = "../images/user_$userId.$ext";
-    file_put_contents($filename, base64_decode($uri));
-    return $filename;
+    if (strpos($imageURI, 'data:image') === 0) {
+        list($type, $uri) = explode(';', $imageURI);
+        $uri = explode(',', $uri)[1];
+        $ext = str_replace('data:image/', '', $type);
+        $filename = "../images/user_$userId.$ext";
+        file_put_contents($filename, base64_decode($uri));
+        return $filename;
+    }
+    return $imageURI;
 }
 
 $user = (new User)->findById((int) $payload['id']);
@@ -23,7 +26,7 @@ case 'GET':
         'profile' => $fields
     ]);
 
-case 'POST':
+case 'PUT':
     $body = $response->getRequestBody();
     $user->updateWith($body);
     $pictureFilename = saveImage($user->id, $body['imageURI']);

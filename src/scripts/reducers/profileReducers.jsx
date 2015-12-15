@@ -8,6 +8,7 @@ const profileState = new Map({
   gender: '',
   imageURI: '',
   description: '',
+  changeProfile: true,
 });
 
 export default function profile(state = profileState, action) {
@@ -21,6 +22,7 @@ export default function profile(state = profileState, action) {
   case 'GET_PROFILE_SUCCESS':
   case 'SET_PROFILE_SUCCESS':
     return state
+    .set('changeProfile', false)
     .set('isLoading', false)
     .merge(action.profile);
 
@@ -29,6 +31,9 @@ export default function profile(state = profileState, action) {
     return state
     .set('isLoading', false)
     .set('errorMessage', action.errorMessage);
+
+  case 'CHANGE_PROFILE':
+    return state.set('changeProfile', true);
 
   default:
     return state;

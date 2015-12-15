@@ -40,6 +40,6 @@ if (isset($_REQUEST['action'])) {
         break;
     }
 } else {
-    $response->status(404)->send(['message' => 'Parameter "action" is required.']);
+    $response->status(400)->send(['message' => 'Parameter "action" is required.']);
 }
 ?>

@@ -21,8 +21,13 @@ class UserProfile extends Component {
     };
   }
 
-  componentWillReceiveProps(nextProps) {
-    this.setState({errorMessage: nextProps.profile.get('errorMessage')});
+  componentWillMount() {
+    const {profile} = this.props;
+    this.setState({
+      errorMessage: profile.get('errorMessage'),
+      imageURI: profile.get('imageURI'),
+      gender: profile.get('gender'),
+    });
   }
 
   onSubmit(event) {
@@ -59,7 +64,7 @@ class UserProfile extends Component {
 
   render() {
     const {email, profile} = this.props;
-    const {errorMessage, imageURI} = this.state;
+    const {errorMessage, imageURI, gender} = this.state;
     return (
       <div className="form-container">
         <div className="card">
@@ -90,7 +95,7 @@ class UserProfile extends Component {
                   type="radio"
                   value="M"
                   name="gender"
-                  defaultChecked={profile.get('gender') === 'M'}
+                  defaultChecked={gender === 'M'}
                   onClick={() => this.setState({gender: 'M'})}
                   required />
                   Male
@@ -100,7 +105,7 @@ class UserProfile extends Component {
                   type="radio"
                   value="F"
                   name="gender"
-                  defaultChecked={profile.get('gender') === 'F'}
+                  defaultChecked={gender === 'F'}
                   onClick={() => this.setState({gender: 'F'})} />
                   Female
               </label>

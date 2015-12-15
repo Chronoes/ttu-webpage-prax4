@@ -55,11 +55,19 @@ class BaseModel {
         return array_merge(['id' => $this->id, 'createdAt' => $this->createdAt], $this->fields);
     }
 
+    private function implodeValues($key, $length) {
+        $string = [];
+        for ($i = 0; $i < $length; $i++) {
+            $string[] = ":$key$i";
+        }
+        return implode(', ', $string);
+    }
+
     private function queryOperations($operationList) {
         $operations = [];
         foreach ($operationList as $key => $action) {
             if (is_array($action)) {
-                $operations[] = "$key $action[op] :$key";
+                $operations[] = "$key $action[op] ".(is_array($action['value']) ? '('.$this->implodeValues($key, count($action['value'])).')' :  ":$key");
             } else {
                 $operations[] = "$key = :$key";
             }
@@ -77,8 +85,14 @@ class BaseModel {
 
     private function bindQueryParams(&$query, $params) {
         foreach ($params as $key => $action) {
-            $value = is_array($action) ? $action['value'] : $action;
-            $query->bindValue(":$key", $value, $this->fieldDefinitions[$key]['type']);
+            $values = is_array($action) ? $action['value'] : $action;
+            if (is_array($values)) {
+                foreach ($values as $i => $value) {
+                    $query->bindValue(":$key$i", $value, $this->fieldDefinitions[$key]['type']);
+                }
+            } else {
+                $query->bindValue(":$key", $values, $this->fieldDefinitions[$key]['type']);
+            }
         }
     }
 
