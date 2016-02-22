@@ -6,9 +6,10 @@ function saveImage($userId, $imageURI) {
         list($type, $uri) = explode(';', $imageURI);
         $uri = explode(',', $uri)[1];
         $ext = str_replace('data:image/', '', $type);
-        $filename = "../images/user_$userId.$ext";
-        file_put_contents($filename, base64_decode($uri));
-        return $filename;
+        $filename = md5("user_$userId").'.'.$ext;
+        $path = "../images/$filename";
+        file_put_contents($path, base64_decode($uri));
+        return $path;
     }
     return $imageURI;
 }
